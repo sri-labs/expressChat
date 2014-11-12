@@ -1,5 +1,5 @@
 {
-  "name": "socket.io-chat",
+  "name": "express-chat",
   "version": "0.0.0",
   "description": "A simple chat client using socket.io",
   "main": "index.js",
@@ -7,6 +7,7 @@
   "private": true,
   "license": "BSD",
   "dependencies": {
-    "express": "3.4.8"
+    "express": "3.4.8",
+    "socket.io": "1.2.0"
   }
 }
