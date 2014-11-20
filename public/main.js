@@ -9,6 +9,7 @@ $(function() {
 
   // Initialize varibles
   var $window = $(window);
+  var $roomInput = $('.roomInput'); // Input for room
   var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
@@ -18,6 +19,7 @@ $(function() {
 
   // Prompt for setting a username
   var username;
+  var room;
   var connected = false;
   var typing = false;
   var lastTypingTime;
@@ -35,19 +37,18 @@ $(function() {
     log(message);
   }
 
-  // Sets the client's username
-  function setUsername () {
+  // Sets the room & the client's username
+  function enterRoom() {
+    room = cleanInput($roomInput.val().trim());
     username = cleanInput($usernameInput.val().trim());
 
-    // If the username is valid
-    if (username) {
+    if (room && username) {
       $loginPage.fadeOut();
       $chatPage.show();
       $loginPage.off('click');
       $currentInput = $inputMessage.focus();
 
-      // Tell the server your username
-      socket.emit('add user', username);
+      socket.emit('enter room', {'room':room, 'username':username});
     }
   }
 
@@ -85,16 +86,16 @@ $(function() {
     }
 
     var $usernameDiv = $('<span class="username"/>')
-      .text(data.username)
-      .css('color', getUsernameColor(data.username));
+        .text(data.username)
+        .css('color', getUsernameColor(data.username));
     var $messageBodyDiv = $('<span class="messageBody">')
-      .text(data.message);
+        .text(data.message);
 
     var typingClass = data.typing ? 'typing' : '';
     var $messageDiv = $('<li class="message"/>')
-      .data('username', data.username)
-      .addClass(typingClass)
-      .append($usernameDiv, $messageBodyDiv);
+        .data('username', data.username)
+        .addClass(typingClass)
+        .append($usernameDiv, $messageBodyDiv);
 
     addMessageElement($messageDiv, options);
   }
@@ -181,7 +182,7 @@ $(function() {
     // Compute hash code
     var hash = 7;
     for (var i = 0; i < username.length; i++) {
-       hash = username.charCodeAt(i) + (hash << 5) - hash;
+      hash = username.charCodeAt(i) + (hash << 5) - hash;
     }
     // Calculate color
     var index = Math.abs(hash % COLORS.length);
@@ -202,7 +203,7 @@ $(function() {
         socket.emit('stop typing');
         typing = false;
       } else {
-        setUsername();
+        enterRoom();
       }
     }
   });
