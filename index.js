@@ -33,12 +33,13 @@ io.on('connection', function (socket) {
     if (rooms[data.room] == undefined) {
       console.log('room create :' + data.room);
       rooms[data.room] = new Object();
-      rooms[data.room].socket_ids = new Object();
+      rooms[data.room].socket_ids = new Array();
     }
 
     // Store current user's nickname and socket.id to MAP
-    rooms[data.room].socket_ids[data.username] = socket.id;
-    ++usersCount;
+    rooms[data.room].socket_ids.push(socket.id);
+    usersCount = rooms[data.room].socket_ids.length;
+    //++usersCount;
 
     addedUser = true;
     socket.emit('login', {
@@ -93,7 +94,7 @@ io.on('connection', function (socket) {
 
     if (room != undefined && rooms[room] != undefined && addedUser) {
       delete rooms[room].socket_ids[socket.username];
-      --usersCount;
+      usersCount = rooms[room].socket_ids.length;
 
       // echo globally that this client has left
       socket.broadcast.to(room).emit('user left', {
