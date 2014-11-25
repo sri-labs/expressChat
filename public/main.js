@@ -23,16 +23,16 @@ $(function() {
   var connected = false;
   var typing = false;
   var lastTypingTime;
-  var $currentInput = $usernameInput.focus();
+  var $currentInput = $roomInput;
 
   var socket = io();
 
   function addParticipantsMessage (data) {
     var message = '';
-    if (data.numUsers === 1) {
+    if (data.usersCount === 1) {
       message += "there's 1 participant";
     } else {
-      message += "there are " + data.numUsers + " participants";
+      message += "there are " + data.usersCount + " participants";
     }
     log(message);
   }
@@ -47,6 +47,7 @@ $(function() {
       $chatPage.show();
       $loginPage.off('click');
       $currentInput = $inputMessage.focus();
+      log('Welcome to ' + room + ' room!');
 
       socket.emit('enter room', {'room':room, 'username':username});
     }
@@ -194,7 +195,7 @@ $(function() {
   $window.keydown(function (event) {
     // Auto-focus the current input when a key is typed
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-      $currentInput.focus();
+      //$currentInput.focus();
     }
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
@@ -216,6 +217,12 @@ $(function() {
 
   // Focus input when clicking anywhere on login page
   $loginPage.click(function () {
+    if( !$roomInput.val() ) {
+      $currentInput = $roomInput;
+    } else {
+      $currentInput = $usernameInput;
+    }
+
     $currentInput.focus();
   });
 
