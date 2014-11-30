@@ -224,6 +224,9 @@ $(function() {
     }
 
     $currentInput.focus();
+  })
+  .on('click', 'input', function (event) {
+    event.stopPropagation();
   });
 
   // Focus input when clicking on the message input's border
