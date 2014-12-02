@@ -25,6 +25,8 @@ $(function() {
 
   var socket = io();
 
+  var showWriteTime = true;
+
   function addParticipantsMessage (data) {
     var message = '';
     if (data.numUsers === 1) {
@@ -56,6 +58,7 @@ $(function() {
     var message = $inputMessage.val();
     // Prevent markup from being injected into the message
     message = cleanInput(message);
+    
     // if there is a non-empty message and a socket connection
     if (message && connected) {
       $inputMessage.val('');
@@ -88,14 +91,16 @@ $(function() {
       .text(data.username)
       .css('color', getUsernameColor(data.username));
     var $messageBodyDiv = $('<span class="messageBody">')
-      .text(data.message);
+      .text(data.message)      
+      ;
 
     var typingClass = data.typing ? 'typing' : '';
     var $messageDiv = $('<li class="message"/>')
       .data('username', data.username)
       .addClass(typingClass)
-      .append($usernameDiv, $messageBodyDiv);
-
+      .append($usernameDiv, $messageBodyDiv)
+      .append(getTimeString())
+      ;
     addMessageElement($messageDiv, options);
   }
 
@@ -145,7 +150,7 @@ $(function() {
   }
 
   // Prevents input from having injected markup
-  function cleanInput (input) {
+  function cleanInput (input) {    
     return $('<div/>').text(input).text();
   }
 
@@ -188,10 +193,34 @@ $(function() {
     return COLORS[index];
   }
 
+  function getTimeString() {
+    if ( !showWriteTime ) {
+      return '';
+    }
+
+    var date = new Date()
+    , y = date.getFullYear()
+    , m = date.getMonth() + 1
+    , d = date.getDate()
+    , h = date.getHours()
+    , i = date.getMinutes()
+    , s = date.getSeconds()
+
+    i = '0'+i.toString();
+    i = i.substr(i.length-2, 2);
+
+    s = '0'+s.toString();
+    s = s.substr(s.length-2, 2);
+
+    return ' <span class="writeTime">(' + m +'.'+ d + ' ' + h +':'+ i +':'+ s + ')<span>';
+    ;
+
+  }
+
   // Keyboard events
 
   $window.keydown(function (event) {
-    // Auto-focus the current input when a key is typed
+    // Auto-focus the current input when a key is typed    
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
       $currentInput.focus();
     }
@@ -263,4 +292,5 @@ $(function() {
   socket.on('stop typing', function (data) {
     removeChatTyping(data);
   });
+
 });
