@@ -1,7 +1,15 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <link rel="apple-touch-icon" href="http://myroomserver.hanul.co:8080/~saramin/static/images/chat_bigger.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="쳇!chat!">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" /><!-- 상태바 색깔 -->
+  <!--<link rel="apple-touch-startup-image" href="/startup.png">--><!-- 로딩이미지 -->
+
   <title>Socket.IO Chat Example</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -39,8 +47,10 @@
     
     <li class="login page">
       <div class="form">
+        <h3 class="title">Room?</h3>
+        <input class="roomInput" type="text" maxlength="14" />
         <h3 class="title">What's your nickname?</h3>
-        <input class="usernameInput" type="text" maxlength="14" value="test" />
+        <input class="usernameInput" type="text" maxlength="14" />
       </div>
     </li>
   </ul>
@@ -48,5 +58,12 @@
   <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/main.js"></script>
+  <!--<script src="/screenfull.js"></script>--><!-- fullscreen lib -->
+
+  <link rel="stylesheet" type="text/css" href="addtohomescreen.css">
+  <script src="addtohomescreen.js"></script>
+  <script>
+    addToHomescreen();
+  </script>
 </body>
 </html>

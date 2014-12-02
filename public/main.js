@@ -9,6 +9,7 @@ $(function() {
 
   // Initialize varibles
   var $window = $(window);
+  var $roomInput = $('.roomInput'); // Input for room
   var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
@@ -18,10 +19,11 @@ $(function() {
 
   // Prompt for setting a username
   var username;
+  var room;
   var connected = false;
   var typing = false;
   var lastTypingTime;
-  var $currentInput = $usernameInput.focus();
+  var $currentInput = $roomInput;
 
   var socket = io();
 
@@ -29,27 +31,27 @@ $(function() {
 
   function addParticipantsMessage (data) {
     var message = '';
-    if (data.numUsers === 1) {
+    if (data.usersCount === 1) {
       message += "there's 1 participant";
     } else {
-      message += "there are " + data.numUsers + " participants";
+      message += "there are " + data.usersCount + " participants";
     }
     log(message);
   }
 
-  // Sets the client's username
-  function setUsername () {
+  // Sets the room & the client's username
+  function enterRoom() {
+    room = cleanInput($roomInput.val().trim());
     username = cleanInput($usernameInput.val().trim());
 
-    // If the username is valid
-    if (username) {
+    if (room && username) {
       $loginPage.fadeOut();
       $chatPage.show();
       $loginPage.off('click');
       $currentInput = $inputMessage.focus();
+      log('Welcome to ' + room + ' room!');
 
-      // Tell the server your username
-      socket.emit('add user', username);
+      socket.emit('enter room', {'room':room, 'username':username});
     }
   }
 
@@ -88,10 +90,10 @@ $(function() {
     }
 
     var $usernameDiv = $('<span class="username"/>')
-      .text(data.username)
-      .css('color', getUsernameColor(data.username));
+        .text(data.username)
+        .css('color', getUsernameColor(data.username));
     var $messageBodyDiv = $('<span class="messageBody">')
-      .text(data.message)      
+        .text(data.message)      
       ;
 
     var typingClass = data.typing ? 'typing' : '';
@@ -101,6 +103,7 @@ $(function() {
       .append($usernameDiv, $messageBodyDiv)
       .append(getTimeString())
       ;
+
     addMessageElement($messageDiv, options);
   }
 
@@ -186,7 +189,7 @@ $(function() {
     // Compute hash code
     var hash = 7;
     for (var i = 0; i < username.length; i++) {
-       hash = username.charCodeAt(i) + (hash << 5) - hash;
+      hash = username.charCodeAt(i) + (hash << 5) - hash;
     }
     // Calculate color
     var index = Math.abs(hash % COLORS.length);
@@ -222,7 +225,7 @@ $(function() {
   $window.keydown(function (event) {
     // Auto-focus the current input when a key is typed    
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-      $currentInput.focus();
+      //$currentInput.focus();
     }
     // When the client hits ENTER on their keyboard
     if (event.which === 13) {
@@ -231,7 +234,7 @@ $(function() {
         socket.emit('stop typing');
         typing = false;
       } else {
-        setUsername();
+        enterRoom();
       }
     }
   });
@@ -244,6 +247,12 @@ $(function() {
 
   // Focus input when clicking anywhere on login page
   $loginPage.click(function () {
+    if( !$roomInput.val() ) {
+      $currentInput = $roomInput;
+    } else {
+      $currentInput = $usernameInput;
+    }
+
     $currentInput.focus();
   });
 
