@@ -5,6 +5,40 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 3000;
 
+function decorateMsg(msg, socket) {
+    message = msg
+    re = /^\/([a-z]+) +(.+?)$/i;
+    matches =  (re.exec(msg));
+    if (!matches || matches.length < 2) {
+
+    }
+    else {
+        command = matches[1];
+        console.log(command);
+        switch (command) {
+            case 'nick':
+                oldname = socket.username;
+                newname = matches[2];
+                socket.username = newname;
+                // add the client's username to the global list
+                //usernames[newname] = newname;
+                message = oldname + ' nickname changed ' + newname;
+                io.to(socket.room).emit('notice', {
+                  username: 'admin',
+                  message: message
+                });
+
+                socket.emit('nick_updated', {'nick': newname}); 
+                break;
+            default:
+                break;
+
+        }
+
+    }
+    return message;
+}
+
 server.listen(port, function () {
   console.log('Server listening at port %d', port);
 });
@@ -20,8 +54,6 @@ var rooms = [],
 
 io.on('connection', function (socket) {
   var addedUser = false;
-
-  //console.log(rooms.size());
 
   socket.on('enter room',function(data){
     socket.join(data.room);
@@ -55,8 +87,10 @@ io.on('connection', function (socket) {
   socket.on('new message', function (data) {
 
     var room = socket.room;
-
+      
     if (room != undefined && rooms[room] != undefined ) {
+      data = decorateMsg(data, socket);
+
       socket.broadcast.to(room).emit('new message', {
         username: socket.username,
         message: data
