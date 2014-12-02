@@ -220,6 +220,10 @@ $(function() {
 
   }
 
+  function chatConnect(data){
+    console.log(data);
+  }
+
   // Keyboard events
 
   $window.keydown(function (event) {
@@ -285,6 +289,7 @@ $(function() {
   // Whenever the server emits 'user joined', log it in the chat body
   socket.on('user joined', function (data) {
     log(data.username + ' joined');
+    log(data.room);
     addParticipantsMessage(data);
   });
 
@@ -304,5 +309,9 @@ $(function() {
   socket.on('stop typing', function (data) {
     removeChatTyping(data);
   });
+
+  socket.on('chat connect', function(data){
+    chatConnect(data);
+  })
 
 });

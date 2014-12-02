@@ -21,6 +21,8 @@ var rooms = [],
 io.on('connection', function (socket) {
   var addedUser = false;
 
+  io.to(socket.id).emit('chat connect', {room : rooms});
+
   //console.log(rooms.size());
 
   socket.on('enter room',function(data){
@@ -48,7 +50,8 @@ io.on('connection', function (socket) {
     // echo globally (all clients) that a person has connected
     socket.broadcast.to(data.room).emit('user joined', {
       username: socket.username,
-      usersCount: usersCount
+      usersCount: usersCount,
+      room : rooms.length
     });
   });
 
