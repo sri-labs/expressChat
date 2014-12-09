@@ -220,8 +220,17 @@ $(function() {
 
   }
 
-  function chatConnect(data){
-    console.log(data);
+  function roomInfoUpdate(data) {
+    var html = '';
+    for (var i = 0 ; i < data.length ; i++) {
+      html += '<li><span><a hef="#">' + data[i].name + '</a></span><ul class="users">';
+      for (var j = 0 ; j < data[i]['users'].length ; j++) {
+        var cls = (0 && '내아이디와같다면') ? 'bold' : '';
+        html += '<li class="' + cls + '">' + data[i]['users'][j] + '</li>';
+      }
+      html += '</ul></li>';
+    }
+    $('#room_list').html(html);
   }
 
   // Keyboard events
@@ -286,6 +295,16 @@ $(function() {
     addChatMessage(data);
   });
 
+  // Whenever the server emits 'new message', update the chat body
+  socket.on('notice', function (data) {
+    addChatMessage(data);
+  });
+
+  // Whenever the server emits 'new message', update the chat body
+  socket.on('nick_updated', function (data) {
+    username = data.nick;
+  });
+  
   // Whenever the server emits 'user joined', log it in the chat body
   socket.on('user joined', function (data) {
     log(data.username + ' joined');
@@ -310,8 +329,9 @@ $(function() {
     removeChatTyping(data);
   });
 
-  socket.on('chat connect', function(data){
-    chatConnect(data);
-  })
+  // Whenever the server emits 'room info updated', refresh room info
+  socket.on('room info updated', function (data) {
+    roomInfoUpdate(data);
+  });
 
 });
