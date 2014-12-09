@@ -29,6 +29,24 @@ $(function() {
 
   var showWriteTime = true;
 
+  var roomsList = [];
+
+  function roomsSearch (data) {
+
+    var rooms = data.room;
+    for(var key in rooms) {
+      if( rooms[key] !== undefined && rooms[key].usersCount > 0 ) {
+        roomsList.push(key);
+      }
+    }
+
+    if( !!roomsList ) {
+      $roomInput.autocomplete({
+        source: roomsList
+      });
+    }
+  }
+
   function addParticipantsMessage (data) {
     var message = '';
     if (data.usersCount === 1) {
@@ -332,6 +350,10 @@ $(function() {
   // Whenever the server emits 'room info updated', refresh room info
   socket.on('room info updated', function (data) {
     roomInfoUpdate(data);
+  });
+
+  socket.on('rooms info', function (data) {
+    roomsSearch(data);
   });
 
 });
