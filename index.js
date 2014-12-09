@@ -89,6 +89,8 @@ var rooms = {},
 
 io.on('connection', function (socket) {
 
+  io.to(socket.id).emit('rooms info', {room : rooms});
+
   socket.on('enter room',function(data){
     socket.join(data.room);
 
