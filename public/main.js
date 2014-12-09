@@ -220,6 +220,19 @@ $(function() {
 
   }
 
+  function roomInfoUpdate(data) {
+    var html = '';
+    for (var i = 0 ; i < data.length ; i++) {
+      html += '<li><span><a hef="#">' + data[i].name + '</a></span><ul class="users">';
+      for (var j = 0 ; j < data[i]['users'].length ; j++) {
+        var cls = (0 && '내아이디와같다면') ? 'bold' : '';
+        html += '<li class="' + cls + '">' + data[i]['users'][j] + '</li>';
+      }
+      html += '</ul></li>';
+    }
+    $('#room_list').html(html);
+  }
+
   // Keyboard events
 
   $window.keydown(function (event) {
@@ -313,6 +326,11 @@ $(function() {
   // Whenever the server emits 'stop typing', kill the typing message
   socket.on('stop typing', function (data) {
     removeChatTyping(data);
+  });
+
+  // Whenever the server emits 'room info updated', refresh room info
+  socket.on('room info updated', function (data) {
+    roomInfoUpdate(data);
   });
 
 });
