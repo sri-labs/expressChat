@@ -40,7 +40,7 @@ $(function() {
       }
     }
 
-    if( !!roomsList ) {
+    if( roomsList.length > 0 ) {
       $roomInput.autocomplete({
         source: roomsList
       });
